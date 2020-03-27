@@ -19,7 +19,7 @@ const styles = createUseStyles({
   },
   openButtonIconWrapper: (props) => ({
     marginLeft: 10,
-    transition: '0.2s',
+    transition: 'transform 0.2s',
     transform: `rotate(${props.states.openButtonHover === true ? 90 : 0}deg)`
   }),
   openButtonIcon: {
@@ -34,9 +34,14 @@ function Header() {
     states: { openButtonHover }
   });
 
+  const openButtonHoverCss = {
+    backgroundColor: 'gray',
+    color: 'white'
+  };
+
   return (
     <div className={classes.headerRoot}>
-      <Button width={300} height={60} borderRadius={10}
+      <Button width={300} height={60} borderRadius={10} onHover={openButtonHoverCss}
         onMouseOver={() => setOpenButtonHover(true)} onMouseLeave={() => setOpenButtonHover(false)}>
         <div className={classes.openButtonText}>View my works</div>
         <div className={classes.openButtonIconWrapper}>

@@ -15,7 +15,7 @@ const styles = createUseStyles({
     transition: props.props.transition,
     cursor: 'pointer',
     '&:hover': {
-      backgroundColor: props.props.hoverColor == null ? props.props.backgroundColor : props.props.hoverColor
+      ...props.props.onHover
     }
   })
 });
@@ -36,7 +36,6 @@ Button.defaultProps = {
   borderRadius: 0,
   alignment: 'center',
   backgroundColor: 'lightgray',
-  hoverColor: 'gray',
   transition: '0.2s'
 }
 
