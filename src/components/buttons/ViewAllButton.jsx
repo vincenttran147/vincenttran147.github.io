@@ -4,6 +4,7 @@ import '@fortawesome/fontawesome-free/css/all.css';
 import anime from 'animejs';
 
 import Button from './Button';
+import AnimatedCanvas from '../../helper/animatedCanvas';
 
 
 const NUMBER_OF_ARROWS = 3;
@@ -106,19 +107,11 @@ function ViewAllButton(props) {
           translateX: item.translateX * shakeMultiplier,
           translateY: item.translateY * shakeMultiplier,
           rotateZ: item.rotateZ * shakeMultiplier
-        })),
-        update: drawSmoke
+        }))
       })
     } else {
       animeButton.current.finished.then(animeButton.current.restart());
     }
-  };
-
-  const drawSmoke = () => {
-    const context = buttonSmokeCanvas.current.getContext('2d');
-    const mainButtonSize = document.getElementById('view-all-main-button').getBoundingClientRect();
-    context.clearRect(0, 0, buttonSmokeCanvas.current.width, buttonSmokeCanvas.current.height);
-    context.drawImage(smokeImg.current, mainButtonSize.right, mainButtonSize.top);
   };
 
   const buttonPointerLeaveHandler = () => {
