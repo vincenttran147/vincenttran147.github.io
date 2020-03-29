@@ -22,11 +22,20 @@ const styles = createUseStyles({
   openButtonIconWrapper: {
     marginRight: 2
   },
-  openButtonIcon: (props) => ({
+  openButtonIcon: {
     fontSize: 60,
     marginLeft: NO_ANIMATION_ARROW_MARGIN_LEFT,
     color: 'gray'
-  })
+  },
+  smokeCanvas: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    overflow: 'hidden',
+    pointerEvents: 'none'
+  }
 });
 
 function ViewAllButton(props) {
@@ -45,6 +54,9 @@ function ViewAllButton(props) {
   }, [classes.openButtonIcon]);
 
   const animeTimeline = useRef(null);
+  const animeButton = useRef(null);
+  const buttonSmokeCanvas = useRef(null);
+  const smokeImg = useRef(null);
   let isMouseLeave = false;
 
   const buttonHoverHandler = () => {
@@ -62,33 +74,75 @@ function ViewAllButton(props) {
       for (let i = arrows.length - 1; i >= 0; --i) {
         animeTimeline.current.add({
           targets: `#arrows-${i}`,
-          color: 'rgb(255, 255, 255)',
-          duration: (arrows.length - i) * 150,
-          delay: i === arrows.length - 1 ? 200 : 0
+          color: 'rgb(211,211,211)',
+          duration: (arrows.length - i) * 100,
+          delay: i === arrows.length - 1 ? 100 : 0,
+          translateX: -5 * (arrows.length - i)
         });
       }
     } else {
       animeTimeline.current.finished.then(animeTimeline.current.restart());
     }
+
+    if (animeButton.current == null) {
+      const shakeMultiplier = 4;
+      const keyframeTemplate = [
+        {translateX: 1, translateY: 1, rotateZ: 0},
+        {translateX: -1, translateY: -2, rotateZ: -1},
+        {translateX: -3, translateY: 0, rotateZ: 1},
+        {translateX: 3, translateY: 2, rotateZ: 0},
+        {translateX: 1, translateY: -1, rotateZ: 1},
+        {translateX: -1, translateY: 2, rotateZ: -1},
+        {translateX: -3, translateY: 1, rotateZ: 0},
+        {translateX: 3, translateY: 1, rotateZ: -1},
+        {translateX: -1, translateY: -1, rotateZ: 1},
+        {translateX: 1, translateY: 2, rotateZ: 0},
+        {translateX: 1, translateY: -2, rotateZ: -1},
+      ];
+      animeButton.current = anime({
+        targets: '#view-all-main-button',
+        loop: true,
+        keyframes: keyframeTemplate.map((item) => ({
+          translateX: item.translateX * shakeMultiplier,
+          translateY: item.translateY * shakeMultiplier,
+          rotateZ: item.rotateZ * shakeMultiplier
+        })),
+        update: drawSmoke
+      })
+    } else {
+      animeButton.current.finished.then(animeButton.current.restart());
+    }
+  };
+
+  const drawSmoke = () => {
+    const context = buttonSmokeCanvas.current.getContext('2d');
+    const mainButtonSize = document.getElementById('view-all-main-button').getBoundingClientRect();
+    context.clearRect(0, 0, buttonSmokeCanvas.current.width, buttonSmokeCanvas.current.height);
+    context.drawImage(smokeImg.current, mainButtonSize.right, mainButtonSize.top);
   };
 
   const buttonPointerLeaveHandler = () => {
     isMouseLeave = true;
+    animeButton.current.pause();
+    document.getElementById('view-all-main-button').style.transform = 'translate(0px, 0px) rotate(0deg)';
   };
 
   const resetArrowColors = () => {
     animeTimeline.current.pause();
     for (let i = 0; i < arrows.length; ++i) {
       arrows[i].ref.style.color = 'gray';
+      arrows[i].ref.style.transform = 'translateX(0px)';
     }
   };
 
   return (
     <div className={classes.buttonRoot}>
+      <img ref={smokeImg} src={require('../../assets/smoke1.png')} style={{display: 'none'}}></img>
+      <canvas ref={buttonSmokeCanvas} className={classes.smokeCanvas} width={window.innerWidth} height={window.innerHeight}></canvas>
       <div className={classes.openButtonIconWrapper}>
         {arrows.map((item) => item.element)}
       </div>
-      <Button width={250} height={60} borderRadius={10}
+      <Button id={'view-all-main-button'} width={250} height={60} borderRadius={10}
         onMouseEnter={buttonHoverHandler} onMouseLeave={buttonPointerLeaveHandler}>
         <div className={classes.openButtonText}>View my works</div>
       </Button>

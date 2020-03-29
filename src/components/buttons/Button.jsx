@@ -24,7 +24,7 @@ function Button(props) {
   const classes = styles({props});
 
   return (
-    <div className={classes.buttonRoot} onMouseEnter={props.onMouseEnter} onMouseLeave={props.onMouseLeave}>
+    <div id={props.id} className={classes.buttonRoot} onMouseEnter={props.onMouseEnter} onMouseLeave={props.onMouseLeave}>
       {props.children}
     </div>
   );
@@ -36,7 +36,8 @@ Button.defaultProps = {
   borderRadius: 0,
   alignment: 'center',
   backgroundColor: 'lightgray',
-  transition: '0.2s'
+  transition: '0.2s',
+  id: 'button'
 }
 
 export default Button;
