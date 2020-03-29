@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import { createUseStyles } from 'react-jss';
 import '@fortawesome/fontawesome-free/css/all.css';
+import anime from 'animejs';
 
 import Button from './Button';
-import { useInterval } from '../../helper/useInterval';
 
 
 const NUMBER_OF_ARROWS = 3;
@@ -30,10 +30,6 @@ const styles = createUseStyles({
 });
 
 function ViewAllButton(props) {
-  const openButtonHover = useRef(false);
-  const arrowColors = [];
-  let arrowIndex = NUMBER_OF_ARROWS - 1;
-
   const classes = styles({
     states: {},
     props
@@ -43,65 +39,49 @@ function ViewAllButton(props) {
     let arrows = [];
     for (let i = 0; i < NUMBER_OF_ARROWS; ++i) {
       arrows[i] = { element: null, ref: null };
-      arrows[i].element = <i ref={ref => arrows[i].ref = ref} key={`arrows-${i}`} className={"fas fa-chevron-left " + classes.openButtonIcon}></i>;
-      arrowColors[i] = 'gray';
+      arrows[i].element = <i id={`arrows-${i}`} ref={ref => arrows[i].ref = ref} key={`arrows-${i}`} className={"fas fa-chevron-left " + classes.openButtonIcon}></i>;
     }
     return arrows;
   }, [classes.openButtonIcon]);
 
+  const animeTimeline = useRef(null);
+  let isMouseLeave = false;
+
   const buttonHoverHandler = () => {
-    openButtonHover.current = true;
-    playArrowsAnimation(NUMBER_OF_ARROWS - 1);
+    isMouseLeave = false;
+    if (animeTimeline.current == null) {
+      animeTimeline.current = anime.timeline({
+        easing: 'linear',
+        loop: true,
+        loopComplete: () => {
+          if (isMouseLeave === true) {
+            resetArrowColors();
+          }
+        }
+      });
+      for (let i = arrows.length - 1; i >= 0; --i) {
+        animeTimeline.current.add({
+          targets: `#arrows-${i}`,
+          color: 'rgb(255, 255, 255)',
+          duration: (arrows.length - i) * 150,
+          delay: i === arrows.length - 1 ? 200 : 0
+        });
+      }
+    } else {
+      animeTimeline.current.finished.then(animeTimeline.current.restart());
+    }
   };
 
   const buttonPointerLeaveHandler = () => {
-    openButtonHover.current = false;
+    isMouseLeave = true;
   };
-
-  const playArrowsAnimation = (i) => {
-    if (i >= 0) {
-      let style = arrows[i].ref.style;
-      style.transition = props.arrowAnimationDuration + 's';
-      arrowColors[i] = arrowColors[i] === 'lightgray' ? 'gray' : 'lightgray';
-      style.color = arrowColors[i];
-      style.marginLeft = NO_ANIMATION_ARROW_MARGIN_LEFT - 10;
-    }
-  }
 
   const resetArrowColors = () => {
+    animeTimeline.current.pause();
     for (let i = 0; i < arrows.length; ++i) {
-      arrowColors[i] = 'gray';
-      let style = arrows[i].ref.style;
-      style.color = arrowColors[i];
+      arrows[i].ref.style.color = 'gray';
     }
   };
-
-  useEffect(() => {
-    const transitionEndListeners = [];
-    for (let i = 0; i < arrows.length; ++i) {
-      transitionEndListeners.push(() => {
-        if (arrowIndex > 0) {
-          --arrowIndex;
-        } else if (openButtonHover.current === true) {
-          arrowIndex = NUMBER_OF_ARROWS - 1;
-        } else if (arrowIndex === 0) {
-          resetArrowColors();
-          arrowIndex = -1;
-        }
-        playArrowsAnimation(arrowIndex);
-      });
-    }
-
-    for (let i = 0; i < arrows.length; ++i) {
-      arrows[i].ref.addEventListener('transitionend', transitionEndListeners[i]);
-    }
-
-    return () => {
-      for (let i = 0; i < arrows.length; ++i) {
-        arrows[i].ref.removeEventListener('transitionend', transitionEndListeners[i]);
-      }
-    }
-  }, []);
 
   return (
     <div className={classes.buttonRoot}>
@@ -109,7 +89,7 @@ function ViewAllButton(props) {
         {arrows.map((item) => item.element)}
       </div>
       <Button width={250} height={60} borderRadius={10}
-        onMouseOver={buttonHoverHandler} onMouseLeave={buttonPointerLeaveHandler}>
+        onMouseEnter={buttonHoverHandler} onMouseLeave={buttonPointerLeaveHandler}>
         <div className={classes.openButtonText}>View my works</div>
       </Button>
     </div>

@@ -24,7 +24,7 @@ function Button(props) {
   const classes = styles({props});
 
   return (
-    <div className={classes.buttonRoot} onMouseOver={props.onMouseOver} onMouseLeave={props.onMouseLeave}>
+    <div className={classes.buttonRoot} onMouseEnter={props.onMouseEnter} onMouseLeave={props.onMouseLeave}>
       {props.children}
     </div>
   );
