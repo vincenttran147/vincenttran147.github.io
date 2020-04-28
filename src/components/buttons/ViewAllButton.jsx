@@ -4,8 +4,6 @@ import '@fortawesome/fontawesome-free/css/all.css';
 import anime from 'animejs';
 
 import Button from './Button';
-import AnimatedCanvas from '../../helper/animatedCanvas';
-
 
 const NUMBER_OF_ARROWS = 3;
 const NO_ANIMATION_ARROW_MARGIN_LEFT = -20;
