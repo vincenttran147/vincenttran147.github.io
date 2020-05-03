@@ -39,7 +39,6 @@ class AnimationManager {
       return this;
     }
 
-    console.log(this._sprites.length);
     for (let i = 0; i < this._sprites.length; ++i) {
       this._sprites[i].draw();
     }

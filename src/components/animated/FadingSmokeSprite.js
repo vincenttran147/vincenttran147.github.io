@@ -4,7 +4,6 @@ export default class FadingSmokeSprite extends Sprite {
   constructor(canvas, image, bounds, vector) {
     super(canvas, image, bounds);
     this._vector = vector;
-    this.draw();
   }
 
   draw() {

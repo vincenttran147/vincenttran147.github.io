@@ -3,8 +3,12 @@ import { createUseStyles } from 'react-jss';
 import '@fortawesome/fontawesome-free/css/all.css';
 import anime from 'animejs';
 
+import Bounds from '../../helper/Bounds';
+import Vector from '../../helper/Vector';
+
 import Button from './Button';
-import FadingSmoke from '../animated/FadingSmoke';
+import FadingSmokeSprite from '../animated/FadingSmokeSprite';
+import AnimationManager from '../../helper/AnimationManager';
 
 const NUMBER_OF_ARROWS = 3;
 const NO_ANIMATION_ARROW_MARGIN_LEFT = -20;
@@ -29,13 +33,10 @@ const styles = createUseStyles({
     color: 'gray'
   },
   smokeCanvas: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    overflow: 'hidden',
-    pointerEvents: 'none'
+    top: -220,
+    width: 500,
+    height: 500,
+    position: 'absolute'
   }
 });
 
@@ -57,8 +58,24 @@ function ViewAllButton(props) {
   const animeTimeline = useRef(null);
   const animeButton = useRef(null);
   const buttonSmokeCanvas = useRef(null);
-  const smokeImg = useRef(null);
   let isMouseLeave = false;
+
+  let smokeInterval = null;
+
+  const playSmoke = () => {
+    const fadingSmokeSprites = [];
+    for (let i = 0; i < 10; ++i) {
+      const x = Math.random() * 100 * 1;
+      const y = Math.random() * 100 * 1;
+      fadingSmokeSprites.push(new FadingSmokeSprite(buttonSmokeCanvas.current, require('../../assets/smoke1.png'),
+        new Bounds(0, 200, 100, 100), new Vector(x, y, 1).normalize()));
+    }
+    const timeout = setTimeout(() => {
+      fadingSmokeSprites.forEach((smoke) => {
+        smoke.dispose();
+      });
+    }, 2000);
+  };
 
   const buttonHoverHandler = () => {
     isMouseLeave = false;
@@ -112,11 +129,19 @@ function ViewAllButton(props) {
     } else {
       animeButton.current.finished.then(animeButton.current.restart());
     }
+
+    if (smokeInterval != null) {
+      clearInterval(smokeInterval);
+    }
+    smokeInterval = setInterval(playSmoke, 1000);
   };
 
   const buttonPointerLeaveHandler = () => {
     isMouseLeave = true;
     animeButton.current.pause();
+    if (smokeInterval != null) {
+      clearInterval(smokeInterval);
+    }
     document.getElementById('view-all-main-button').style.transform = 'translate(0px, 0px) rotate(0deg)';
   };
 
@@ -128,10 +153,27 @@ function ViewAllButton(props) {
     }
   };
 
+  // useEffect(() => {
+  //   const fadingSmokeSprites = [];
+  //   for (let i = 0; i < 10; ++i) {
+  //     const x = Math.random() * 100 * 1;
+  //     const y = Math.random() * 100 * 1;
+  //     fadingSmokeSprites.push(new FadingSmokeSprite(buttonSmokeCanvas.current, require('../../assets/smoke1.png'),
+  //       new Bounds(0, 200, 100, 100), new Vector(x, y, 1).normalize()));
+  //   }
+  //   const timeout = setTimeout(() => {
+  //     fadingSmokeSprites.forEach((smoke) => {
+  //       smoke.dispose();
+  //     });
+  //   }, 2000)
+
+  //   return () => {
+  //     clearTimeout(timeout);
+  //   }
+  // }, []);
+
   return (
     <div className={classes.buttonRoot}>
-      <img ref={smokeImg} src={require('../../assets/smoke1.png')} style={{display: 'none'}}></img>
-      <canvas ref={buttonSmokeCanvas} className={classes.smokeCanvas} width={window.innerWidth} height={window.innerHeight}></canvas>
       <div className={classes.openButtonIconWrapper}>
         {arrows.map((item) => item.element)}
       </div>
@@ -139,7 +181,9 @@ function ViewAllButton(props) {
         onMouseEnter={buttonHoverHandler} onMouseLeave={buttonPointerLeaveHandler}>
         <div className={classes.openButtonText}>View my works</div>
       </Button>
-      <FadingSmoke />
+      <div style={{position: 'relative'}}>
+        <canvas ref={buttonSmokeCanvas} className={classes.smokeCanvas} width={500} height={500}></canvas>
+      </div>
     </div>
   );
 }

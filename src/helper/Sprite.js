@@ -12,7 +12,6 @@ export default class Sprite {
     this._image.onload = () => {
       AnimationManager.registerCanvas(this._canvas);
       AnimationManager.register(this);
-      this.draw();
     }
   }
 
