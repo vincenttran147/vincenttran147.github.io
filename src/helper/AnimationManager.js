@@ -27,8 +27,8 @@ class AnimationManager {
   }
 
   update() {
+    requestAnimationFrame(this.update.bind(this));
     if (this._canvas == null) {
-      requestAnimationFrame(this.update.bind(this));
       return this;
     }
     
@@ -42,7 +42,6 @@ class AnimationManager {
     for (let i = 0; i < this._sprites.length; ++i) {
       this._sprites[i].draw();
     }
-    requestAnimationFrame(this.update.bind(this));
     return this;
   }
 }
