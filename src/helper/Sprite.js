@@ -10,6 +10,7 @@ export default class Sprite {
     this._bounds = bounds == null ? new Bounds(0, 0, 100, 100) : bounds.clone();
 
     this._image.onload = () => {
+      AnimationManager.registerCanvas(this._canvas);
       AnimationManager.register(this);
       this.draw();
     }

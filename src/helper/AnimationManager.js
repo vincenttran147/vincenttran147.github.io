@@ -1,7 +1,13 @@
 class AnimationManager {
-  constructor() {
+  constructor(canvas) {
+    this._canvas = canvas;
     this._sprites = [];
     this.update();
+  }
+
+  registerCanvas(canvas) {
+    this._canvas = canvas;
+    return this;
   }
 
   register(sprite) {
@@ -13,22 +19,29 @@ class AnimationManager {
     sprites = Array.isArray(sprites) ? sprites : [sprites];
     for (let i = 0; i < sprites.length; ++i) {
       const index = this._sprites.indexOf(sprites[i]);
-      if (index > 0) {
+      if (index >= 0) {
         this._sprites.splice(index, 1);
       }
       delete sprites[i];
-      console.log(this._sprites.length);
     }
   }
 
   update() {
-    if (this._sprites.length > 0) {
-      const canvas = this._sprites[0]._canvas;
-      const context = canvas.getContext('2d');
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      for (let i = 0; i < this._sprites.length; ++i) {
-        this._sprites[i].draw();
-      }
+    if (this._canvas == null) {
+      requestAnimationFrame(this.update.bind(this));
+      return this;
+    }
+    
+    const context = this._canvas.getContext('2d');
+    context.clearRect(0, 0, this._canvas.width, this._canvas.height);
+
+    if (this._sprites.length === 0) {
+      return this;
+    }
+
+    console.log(this._sprites.length);
+    for (let i = 0; i < this._sprites.length; ++i) {
+      this._sprites[i].draw();
     }
     requestAnimationFrame(this.update.bind(this));
     return this;
