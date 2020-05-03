@@ -4,6 +4,7 @@ import '@fortawesome/fontawesome-free/css/all.css';
 import anime from 'animejs';
 
 import Button from './Button';
+import FadingSmoke from '../animated/FadingSmoke';
 
 const NUMBER_OF_ARROWS = 3;
 const NO_ANIMATION_ARROW_MARGIN_LEFT = -20;
@@ -12,7 +13,8 @@ const styles = createUseStyles({
   buttonRoot: {
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    position: 'relative'
   },
   openButtonText: {
     fontFamily: '"Roboto", sans-serif',
@@ -137,6 +139,7 @@ function ViewAllButton(props) {
         onMouseEnter={buttonHoverHandler} onMouseLeave={buttonPointerLeaveHandler}>
         <div className={classes.openButtonText}>View my works</div>
       </Button>
+      <FadingSmoke />
     </div>
   );
 }
