@@ -21,11 +21,21 @@ function FadingSmoke() {
   const classes = styles();
 
   useEffect(() => {
+    const fadingSmokeSprites = [];
     for (let i = 0; i < 10; ++i) {
       const x = Math.random() * 100 * 1;
       const y = Math.random() * 100 * 1;
-      const fadingSmokeSprite = new FadingSmokeSprite(canvas.current, require('../../assets/smoke1.png'),
-        new Bounds(0, 200, 100, 100), new Vector(x, y, 1).normalize());
+      fadingSmokeSprites.push(new FadingSmokeSprite(canvas.current, require('../../assets/smoke1.png'),
+        new Bounds(0, 200, 100, 100), new Vector(x, y, 1).normalize()));
+    }
+    const timeout = setTimeout(() => {
+      fadingSmokeSprites.forEach((smoke) => {
+        smoke.dispose();
+      });
+    }, 2000)
+
+    return () => {
+      clearTimeout(timeout);
     }
   }, []);
 
